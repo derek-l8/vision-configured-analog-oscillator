@@ -1,0 +1,16 @@
+# LTspice generated files
+*.raw
+*.op.raw
+*.db
+*.net
+*.plt
+
+# Temporary and backup files
+*.tmp
+*.bak
+*~
+
+# Operating-system files
+Thumbs.db
+Desktop.ini
+.DS_Store
