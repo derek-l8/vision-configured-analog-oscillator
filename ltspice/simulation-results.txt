@@ -1,0 +1,30 @@
+LTspice 26.0.2 for Windows
+Circuit: analog-oscillator-v8.asc
+
+Simulation settings
+-------------------
+method=gear
+gmin=1n
+cshunt=1p
+tnom=27 C
+temp=27 C
+transient=0 to 12 s, maximum timestep 20 us, startup enabled
+simulated button hold=6 to 7 s
+Rp=5.1 kohm
+Cadd1=1 pF
+Cadd2=1 pF
+
+Measurements
+------------
+inormal: RMS(I(RBUZ))=0.00544116936854 FROM 5.2 TO 5.7
+iheld: RMS(I(RBUZ))=3.09424318551e-06 FROM 6.7 TO 6.9
+irecovered: RMS(I(RBUZ))=0.00536186321087 FROM 11.2 TO 11.5
+tnormal=0.00256786828812 FROM 5.00120432649 TO 5.00377219478
+theld=0.00256734354614 FROM 6.70116221881 TO 6.70372956236
+fnormal=389.428073327 Hz
+fheld=389.50766893 Hz
+pitchshiftpct=0.0204391023898
+
+These values were copied from the generated LTspice log. The generated log and
+raw simulation output are excluded because they contain local paths or are not
+required to inspect and rerun the schematic.

@@ -1,6 +1,6 @@
-# Configurable Analog Oscillator
+# Vision-Configured Analog Oscillator
 
-Hardware and LTspice phase complete. Potentiometer calibration, physical waveform measurements, computer vision, and automated LTspice control remain in progress.
+The current analog hardware build and LTspice model are complete. A manual ten-photo computer-vision capture preflight is also complete; model training, potentiometer calibration, physical waveform measurements, and automated LTspice control remain in progress.
 
 ## Demonstration
 
@@ -28,7 +28,7 @@ Holding the momentary button discharges the 300 µF envelope through 1 kΩ, redu
 The final circuit was simulated in LTspice 26.0.2. The reference run uses `Rp = 5.1 kΩ`, with both additional timing capacitors disconnected; `1 pF` represents each open switch. A 12-second transient simulation applies a one-second button hold from 6–7 seconds.
 
 - [Open the LTspice schematic](ltspice/analog-oscillator-v8.asc)
-- [View the simulation log](ltspice/analog-oscillator-v8.log)
+- [View the simulation results](ltspice/simulation-results.txt)
 
 ### Filter response
 
@@ -83,45 +83,23 @@ The current build keeps the original project’s oscillator, passive buzzer, and
 - LTspice uses generic NPN models and represents the passive buzzer as a 16 Ω resistive load. The simulation therefore predicts electrical behavior, not exact loudness or acoustic response.
 - The LED shows the envelope more clearly than the passive buzzer reproduces it acoustically.
 - The current breadboard is a single hand-wired prototype, so component tolerances and wiring parasitics are not characterized.
+- The computer-vision model has not been trained or evaluated. The manual capture preflight establishes only that the marked controls remain identifiable after the planned input resize.
 
-## Planned computer-vision extension
+## Computer-vision phase
 
-The next phase will use photographs of this fixed breadboard to estimate its persistent control state:
+The next phase will test whether a compact CNN can recover the persistent control configuration of this fixed breadboard from a saved photograph. It will estimate board rotation, potentiometer center and pointer direction, and the independent states of the two maintained switches. The momentary button, LED brightness, and buzzer state are not targets.
 
-- Board orientation
-- Potentiometer center and pointer direction
-- Timing-capacitor switch 1
-- Timing-capacitor switch 2
+The primary implementation will use a small PyTorch CNN trained from scratch. A separate Python controller will combine accepted predictions with measured potentiometer calibration and a verified switch-to-capacitor mapping, then run LTspice to estimate frequency and waveform behavior.
 
-A compact multi-output CNN will produce these estimates with confidence values. A separate Python program will convert the potentiometer angle through a measured resistance calibration, map the switch states to LTspice parameters, run the corresponding simulation, and report the expected frequency and waveform characteristics.
+A manual ten-photo capture preflight confirmed that the orange potentiometer pointer and blue switch tabs remained readable at the planned `576 x 768` input size across moderate changes in rotation, perspective, lighting, and framing. This was not model evaluation; no model has been trained.
 
-The button, LED brightness, and buzzer state are not CNN targets. They are momentary output features rather than persistent circuit configuration.
-
-This phase has not yet been implemented. The immediate prerequisites are potentiometer calibration, a documented switch-state mapping, and a session-separated image dataset.
+See the [computer-vision implementation plan](docs/computer-vision-plan.md) and [dataset protocol](data/README.md) for the detailed conventions, data design, labels, and evaluation approach.
 
 ## Repository contents
 
-```text
-.
-├── README.md
-├── hardware/
-│   ├── media/
-│   │   ├── completed-breadboard.JPG
-│   │   ├── breadboard-overhead.JPG
-│   │   ├── breadboard-side.JPG
-│   │   ├── controls-closeup.JPG
-│   │   ├── envelope-controls-closeup.JPG
-│   │   ├── hardware-demo.mp4
-│   │   └── envelope-fade-closeup.mp4
-│   └── history/
-│       ├── original-prototype.jpg
-│       └── original-prototype-demo.mp4
-└── ltspice/
-    ├── analog-oscillator-v8.asc
-    ├── analog-oscillator-v8.log
-    ├── final-schematic.png
-    ├── filter-response.png
-    └── envelope-response.png
-```
+- `hardware/media/`: current breadboard photographs and demonstrations.
+- `hardware/history/`: the original physics-class prototype.
+- `ltspice/`: the editable schematic, simulation results, and waveform images.
+- `docs/` and `data/`: the computer-vision implementation plan and dataset protocol.
 
-The LTspice `.raw`, `.db`, and operating-point files are intentionally excluded because they are generated artifacts and are not needed to inspect or rerun the schematic.
+Generated LTspice `.raw`, `.db`, `.log`, and operating-point files are excluded because they are not needed to inspect or rerun the schematic. Full-resolution datasets, processed tensors, training runs, and model checkpoints are also excluded from ordinary Git history; reviewed samples and final release artifacts can be published separately.
