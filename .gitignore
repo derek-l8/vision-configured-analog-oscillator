@@ -18,6 +18,9 @@ Desktop.ini
 
 # Python environments and caches
 .venv/
+.venv-cv/
+.uv/
+.tools/
 __pycache__/
 *.py[cod]
 .pytest_cache/

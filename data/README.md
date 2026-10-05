@@ -1,11 +1,12 @@
 # Image Dataset Protocol
 
-The working image dataset is stored locally and is not committed to ordinary Git history. This directory documents how images are captured, named, labeled, split, and eventually reviewed for publication.
+The private working dataset remains local. The [published first session](pilot-s01/README.md) contains its 40 processed training photos, manual annotations, and a portable manifest. This directory documents capture, labels, splits, and publication.
 
 ## Capture convention
 
 - Original full-resolution JPEG from the rear 1x iPhone camera.
 - Portrait 4:3 image with power module at the top and buzzer at the bottom.
+- Landscape files with power on the left are also accepted: after EXIF correction, import and prediction turn them clockwise into portrait before resizing. Originals remain unchanged.
 - Complete breadboard and rails visible without clipping.
 - Primary dataset captured unpowered with the momentary button released.
 - Orange potentiometer pointer and both blue switch tabs unobstructed.
@@ -25,11 +26,11 @@ The ten-image visibility set includes closer, farther, rotated, tilted, and diff
 The ten approximate potentiometer targets are:
 
 ```text
-P00  30 degrees    P05  163 degrees
-P01  57 degrees    P06  190 degrees
-P02  83 degrees    P07  217 degrees
-P03 110 degrees    P08  243 degrees
-P04 137 degrees    P09  270 degrees
+P00  45 degrees    P05 195 degrees
+P01  75 degrees    P06 225 degrees
+P02 105 degrees    P07 255 degrees
+P03 135 degrees    P08 285 degrees
+P04 165 degrees    P09 315 degrees
 ```
 
 Actual pointer angle is calculated from annotation. Later physical calibration maps that angle to resistance.
@@ -59,7 +60,7 @@ s01_p00_l0_r1_004.jpg
 data/
   README.md
   manifests/          # reviewed capture manifests and split definitions
-  sample-images/      # small, reviewed public subset added later
+  pilot-s01/          # reviewed public training photos, labels, and manifest
   raw/                # original private JPEGs; ignored by Git
   processed/          # generated tensors/previews; ignored by Git
   local-annotations/  # working annotations; ignored by Git
@@ -82,7 +83,11 @@ capture_notes
 
 The annotation output adds ordered rail points, potentiometer center, potentiometer tip, validity status, and optional quality notes. A version field is required in both formats so later schema changes can be migrated deliberately.
 
+The board axis is ordered from the buzzer/bottom end to the power-module/top end. Potentiometer center-to-tip follows the mathematical convention: right is 0 degrees, up is 90 degrees, and angles increase counterclockwise. The tip is the pointed end of the orange tape. For both switches, blue toward the board top is ON and blue toward the bottom is OFF.
+
 ## Splitting and publication
+
+The default `pilot-capture-plan.csv` contains 120 photos: `s01` is training, `s02` validation, and `s03` test. `capture-plan --sessions 6` adds training sessions `s04`–`s06` while keeping the same held-out sessions. The earlier `capture-plan.csv` is retained for historical reference, with its original six-session splits. Existing imported manifests retain their original splits; do not relabel historical runs after training.
 
 - Split by complete capture session, never by randomly mixing photographs from one setup.
 - Keep augmented images in the same split as their source.
@@ -90,4 +95,4 @@ The annotation output adds ordered rail points, potentiometer center, potentiome
 - Keep an external-camera challenge set separate from primary model selection.
 - Do not report the ten visibility photographs as training data or model evaluation.
 - Remove location metadata and review backgrounds before publishing any original image.
-- Publish only reviewed sample images in Git; distribute any complete dataset separately if needed.
+- The reviewed 40-photo processed session is included in Git (about 7.4 MB of JPEGs). Full-resolution originals and private working directories remain ignored; review size and privacy before publishing further sessions.

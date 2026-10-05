@@ -1,0 +1,31 @@
+[project]
+name = "oscillator-cv"
+version = "0.1.0"
+description = "Computer-vision infrastructure for the vision-configured analog oscillator"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "numpy>=2.0,<3",
+  "opencv-python>=4.10,<5",
+  "pillow>=11,<13",
+  "torch>=2.7,<3",
+]
+
+[project.scripts]
+oscillator-cv = "oscillator_cv.cli:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3,<10",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/oscillator_cv"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]

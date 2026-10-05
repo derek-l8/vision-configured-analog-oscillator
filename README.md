@@ -1,6 +1,6 @@
 # Vision-Configured Analog Oscillator
 
-The current analog hardware build and LTspice model are complete. A manual ten-photo computer-vision capture preflight is also complete; model training, potentiometer calibration, physical waveform measurements, and automated LTspice control remain in progress.
+A hand-controlled analog sound circuit, with a custom CNN being developed to read its potentiometer and switches from photographs. The breadboard and LTspice model are complete; the CV pipeline has been trained on 40 photos and still needs testing on an independent capture session. Circuit calibration and the CV-to-LTspice controller remain unfinished.
 
 ## Demonstration
 
@@ -83,23 +83,30 @@ The current build keeps the original project’s oscillator, passive buzzer, and
 - LTspice uses generic NPN models and represents the passive buzzer as a 16 Ω resistive load. The simulation therefore predicts electrical behavior, not exact loudness or acoustic response.
 - The LED shows the envelope more clearly than the passive buzzer reproduces it acoustically.
 - The current breadboard is a single hand-wired prototype, so component tolerances and wiring parasitics are not characterized.
-- The computer-vision model has not been trained or evaluated. The manual capture preflight establishes only that the marked controls remain identifiable after the planned input resize.
+- Computer-vision results so far use the same photographs for training and evaluation. They establish training fit, not accuracy on new photographs; an independent capture session is still needed.
 
 ## Computer-vision phase
 
-The next phase will test whether a compact CNN can recover the persistent control configuration of this fixed breadboard from a saved photograph. It will estimate board rotation, potentiometer center and pointer direction, and the independent states of the two maintained switches. The momentary button, LED brightness, and buzzer state are not targets.
+The implemented pipeline is designed to test whether a compact CNN can recover the persistent control configuration of this fixed breadboard from a saved photograph. It estimates board rotation, potentiometer center and orange-tape pointer tip, and the independent states of the two maintained switches. The momentary button, LED brightness, and buzzer state are not targets.
 
-The primary implementation will use a small PyTorch CNN trained from scratch. A separate Python controller will combine accepted predictions with measured potentiometer calibration and a verified switch-to-capacitor mapping, then run LTspice to estimate frequency and waveform behavior.
+The primary implementation is a small PyTorch CNN trained from scratch, with a shared encoder, sine/cosine orientation regression, two switch logits, and half-resolution center/tip heatmaps. A separate Python controller will later combine accepted predictions with measured potentiometer calibration and a verified switch-to-capacitor mapping, then run LTspice to estimate frequency and waveform behavior.
 
-A manual ten-photo capture preflight confirmed that the orange potentiometer pointer and blue switch tabs remained readable at the planned `576 x 768` input size across moderate changes in rotation, perspective, lighting, and framing. This was not model evaluation; no model has been trained.
+A ten-photo capture preflight checked control visibility at the planned `576 x 768` input size. The first 40-photo training session then exposed problems that synthetic execution tests had missed: background-dominated heatmap loss, small-batch normalization mismatch, and loss of switch-position information. The revised model passed an eight-photo overfit check. This is evidence that the implementation can learn the supplied labels, not that it generalizes to new photographs.
 
-See the [computer-vision implementation plan](docs/computer-vision-plan.md) and [dataset protocol](data/README.md) for the detailed conventions, data design, labels, and evaluation approach.
+See the [experiment history](docs/cv-experiments.md) for run-by-run changes, results, and unsuccessful diagnostics. The [computer-vision implementation and usage guide](docs/computer-vision-plan.md) and [dataset protocol](data/README.md) cover commands, conventions, labels, and evaluation boundaries.
+
+The [first annotated capture session](data/pilot-s01/README.md) includes all 40 processed training photographs, unchanged manual labels, and a portable manifest. Image metadata has been removed. This makes the training inputs inspectable; it does not supply independent validation data.
 
 ## Repository contents
 
 - `hardware/media/`: current breadboard photographs and demonstrations.
 - `hardware/history/`: the original physics-class prototype.
 - `ltspice/`: the editable schematic, simulation results, and waveform images.
-- `docs/` and `data/`: the computer-vision implementation plan and dataset protocol.
+- `src/oscillator_cv/`: the computer-vision package and `oscillator-cv` CLI.
+- `tests/`: unit and command-level integration tests, including synthetic CPU train/resume/predict coverage.
+- `scripts/overfit_check.py`: a bounded real-photo training-fit diagnostic with prediction overlays.
+- `data/pilot-s01/`: the published 40-photo training session, labels, and portable manifest.
+- `docs/` and `data/`: the computer-vision implementation guide and dataset protocol.
+- `pyproject.toml` and `uv.lock`: the Python 3.12 environment definition and lockfile.
 
-Generated LTspice `.raw`, `.db`, `.log`, and operating-point files are excluded because they are not needed to inspect or rerun the schematic. Full-resolution datasets, processed tensors, training runs, and model checkpoints are also excluded from ordinary Git history; reviewed samples and final release artifacts can be published separately.
+Generated LTspice `.raw`, `.db`, `.log`, and operating-point files are excluded because they are not needed to inspect or rerun the schematic. Full-resolution originals, private working datasets, training runs, and model checkpoints remain excluded from Git. The reviewed processed pilot session is included separately under `data/pilot-s01/`.
