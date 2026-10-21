@@ -8,8 +8,15 @@ A hand-controlled analog sound circuit, with a custom CNN being developed to rea
 
 The completed 5 V breadboard oscillator provides three persistent controls: one potentiometer and two independently switched timing capacitors. A momentary button discharges an RC envelope, gradually reducing the buzzer-driver current while the LED fades. Releasing the button allows both to recover.
 
-- [Watch the complete hardware demonstration](hardware/media/hardware-demo.mp4)
-- [Watch the envelope and LED close-up](hardware/media/envelope-fade-closeup.mp4)
+**Hardware demonstration**
+
+https://github.com/user-attachments/assets/6a8cb63d-4a44-4317-ac0d-6d29a920b673
+
+**Envelope and LED close-up**
+
+https://github.com/user-attachments/assets/1e42837d-ddef-4ed7-b5bc-d3109db0a690
+
+Audio is amplified with peak limiting for audibility.
 
 ## Circuit overview
 
@@ -65,7 +72,7 @@ This project began as a physics-class demonstration of a two-transistor astable 
 
 ![Original physics-class prototype](hardware/history/original-prototype.jpg)
 
-- [Watch the original prototype demonstration](hardware/history/original-prototype-demo.mp4)
+https://github.com/user-attachments/assets/623c1aa6-c2fb-44d2-a902-93ec4056ba6b
 
 | Stage | Main change | Result |
 |---|---|---|
