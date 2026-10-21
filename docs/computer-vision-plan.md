@@ -1,4 +1,7 @@
-# Computer-Vision Implementation Plan
+# Computer vision: architecture and development
+
+For inspecting the published dataset or running its examples, start with
+[verification](verification.md). This page covers the model and ongoing data collection.
 
 ## Objective
 
@@ -11,15 +14,14 @@ The ten-image visibility check, synthetic execution tests, and first 40-photo re
 - Primary source: original iPhone JPEG photographs.
 - Canonical input: portrait, with the power module at the top and buzzer at the bottom.
 - Model size: `576 x 768`, using aspect-preserving resize and padding when required.
-- Expected board rotation: approximately plus or minus 25 degrees in the image plane.
-- Expected camera perspective: near-overhead, with mild tilt up to approximately 15 degrees.
+- Expected board alignment: roughly upright, with small natural camera alignment differences; deliberate rotation across a fixed angular range is outside the current capture scope.
+- Expected camera perspective: near-overhead, with small natural perspective differences; avoid deliberate tilt and keep incidental tilt modest (roughly within 15 degrees).
 - `S_LEFT`: maintained switch on the left in the canonical portrait view.
 - `S_RIGHT`: maintained switch on the right in the canonical portrait view.
 - Switch actuator toward the power module: ON.
 - Switch actuator toward the buzzer: OFF.
 - Potentiometer angle: 0 degrees right, 90 degrees up, increasing counterclockwise.
 - Potentiometer pointer tip: the pointed end of the orange tape arrow.
-- Both switches: blue slider toward the power-module/top end is ON; toward the buzzer/bottom end is OFF.
 
 The electrical mapping from `S_LEFT` and `S_RIGHT` to LTspice parameters `Cadd1` and `Cadd2` will be established separately with a powered-off continuity test. It will not be inferred from image appearance.
 
@@ -38,11 +40,13 @@ Collection proceeds in stages:
 
 Each full session covers ten potentiometer targets from 45 through 315 degrees in 30-degree increments and all four switch combinations. The exact angle is derived from annotated center and pointer-tip coordinates rather than assumed from the requested capture position.
 
-Capture sessions vary lighting, background, distance, and perspective. Board rotation also varies within sessions. Dataset splits use complete sessions so near-duplicate photographs from one setup cannot appear in both training and evaluation.
+Capture sessions use fresh camera setups and ordinary changes in lighting, background, or framing within the intended near-overhead conditions. Keep the board roughly aligned; repositioning the camera naturally supplies small alignment differences without a deliberate rotation pattern. Dataset splits use complete sessions so near-duplicate photographs from one setup cannot appear in both training and evaluation.
+
+Next, capture and annotate `s02` and evaluate the existing 60-epoch checkpoint unchanged before retraining. Use validation failures to decide whether additional training captures or model changes are necessary. Reserve an independent `s03` for the final frozen-model test. See the [s02 capture checklist](../data/README.md#next-capture-s02) for the grid and filenames. Generated plans record 0 degrees as the nominal alignment intent; measured rotation still comes from annotation.
 
 The three-session pilot uses `s01` for training, `s02` for validation, and `s03` for the final test. The six-session plan keeps `s02` and `s03` held out and adds `s04`–`s06` to training. Choose the split before import; generating a new capture plan does not change an existing imported manifest. The earlier 40-photo runs used only `s01`.
 
-The [published s01 package](../data/pilot-s01/README.md) contains all 40 processed inputs and their manual labels. Its image paths resolve relative to the manifest, so it can be moved or loaded from another working directory. Use `data/pilot-s01/manifest.json` and `data/pilot-s01/annotations.json` in the training commands below without importing or annotating again. All records are training data; validation/test commands require additional sessions.
+The [published s01 package](../data/pilot-s01/README.md) contains all 40 processed inputs and their manual labels. Its image paths resolve relative to the manifest, so it can be moved or loaded from another working directory. The [verification examples](verification.md#optional-training-and-evaluation) use this package without importing or annotating again. All records are training data; validation/test commands require additional sessions.
 
 ## Labels and geometry
 
@@ -109,74 +113,87 @@ Confidence calibration, rejection coverage, error among accepted images, and bre
 
 Vision error, calibration error, LTspice-model error, and physical measurement error will be reported separately. Simulation output will not be presented as an oscilloscope measurement.
 
-## Local setup
+## Collecting another session
 
-The project requires Python 3.12 and `uv`. Run these PowerShell commands from the repository root, with `uv` available on PATH. Keep all environment state inside ignored repository directories:
+Follow the [capture protocol](../data/README.md), including the `s02` grid and
+filenames. Demo-video rotation and cropping are presentation edits; training
+photos still use the portrait convention with power at the top.
+The checked-in `pilot-capture-plan.csv` specifies roughly upright alignment.
+The older `capture-plan.csv` retains historical deliberate-rotation targets and
+must not be used for new captures.
 
-```powershell
-$repo = (Resolve-Path .).Path
-$env:UV_PYTHON_INSTALL_DIR = Join-Path $repo '.uv\python'
-$env:UV_CACHE_DIR = Join-Path $repo '.uv\cache'
-$env:UV_PROJECT_ENVIRONMENT = Join-Path $repo '.venv-cv'
-uv python install 3.12
-uv sync --python 3.12
-```
-
-Run commands through `.\.venv-cv\Scripts\python.exe -m oscillator_cv`. Generated datasets, environments, checkpoints, and runs are ignored by Git.
-
-## CLI workflow
-
-Replace `<timestamp>` in the examples with a new run tag, such as `pilot-001`, and `IMAGE` with your photograph path. Quote paths that contain spaces. Use validation results while tuning; reserve the test session for the frozen model.
-
-Generate the three-session pilot plan (120 photos):
+After the [environment setup](verification.md#environment), place your original
+JPEGs in `data/raw/` using the plan's filenames. Run these PowerShell commands
+from the repository root, choosing new output names for each import:
 
 ```powershell
-.\.venv-cv\Scripts\python.exe -m oscillator_cv capture-plan --output data\manifests\pilot-capture-plan.csv
+.\.venv-cv\Scripts\python.exe -m oscillator_cv import-images data\raw --capture-plan data\manifests\pilot-capture-plan.csv --output-dir data\processed\session-001 --manifest data\processed\session-001.json
+if ($LASTEXITCODE -ne 0) { throw 'Image import failed.' }
+.\.venv-cv\Scripts\python.exe -m oscillator_cv annotate data\processed\session-001.json --output data\local-annotations\session-001.json
+.\.venv-cv\Scripts\python.exe -m oscillator_cv preprocess-check data\processed\session-001.json --annotations data\local-annotations\session-001.json --output-dir runs\session-overlays-001
 ```
 
-For the expanded 240-photo plan, add `--sessions 6` and use a separate output filename. The checked-in `pilot-capture-plan.csv` contains the pilot. The earlier `capture-plan.csv` is retained with its original six-session splits for historical reference; do not use it for the three-session pilot.
+Import applies EXIF orientation first. Remaining landscape images rotate 90°
+clockwise, then resize and pad to 576 × 768. Landscape originals must have power
+on the left; portrait originals must have it at the top. Originals stay unchanged.
 
-Import original JPEGs without modifying them. EXIF orientation is applied first. Images that still display landscape are turned 90 degrees clockwise before aspect-preserving resize and padding to 576×768 RGB. Landscape captures must have the power module on the left; portrait captures must have it at the top. Import and prediction use the same rule, retaining small board-angle variations. Annotation and transform coordinates refer to the canonical portrait image:
+In the annotation window, click the board-axis tail at the buzzer end, then the
+head at the power end. Click near the potentiometer to open original-resolution
+zoom, then select its center and the orange arrow tip.
+
+| Key | Action |
+|---|---|
+| `1` / `2` | Left switch OFF / ON |
+| `3` / `4` | Right switch OFF / ON |
+| `v` / `o` / `a` / `r` | Valid / occluded / ambiguous / rejected |
+| `n` / `q` | Save and advance / stop |
+| `z` / `e` | Reset / redo potentiometer points |
+
+`--review-pot` refines saved valid labels with original-resolution zoom while
+preserving axis and switch labels. Review overlays before training or evaluation.
+Keep imported manifests and labels local; publishing another session requires a
+separate image and metadata review.
+
+The command below generates an expanded plan in an ignored working directory.
+It adds training sessions `s04`–`s06` while retaining `s02` for validation and
+`s03` for the final test:
 
 ```powershell
-.\.venv-cv\Scripts\python.exe -m oscillator_cv import-images data\raw --capture-plan data\manifests\pilot-capture-plan.csv --output-dir data\processed\import-<timestamp> --manifest data\processed\manifest-<timestamp>.json
+.\.venv-cv\Scripts\python.exe -m oscillator_cv capture-plan --sessions 6 --output data\local-annotations\expanded-plan.csv
 ```
 
-Annotate the ordered board axis, potentiometer center/tip, and both switch states:
+Use its path with `import-images --capture-plan` for expanded captures. Generating
+a plan does not alter earlier imports or their splits. Once `s02` is annotated,
+evaluate the existing checkpoint unchanged before deciding on more training.
+
+## Training and diagnostics
+
+[Verification](verification.md#optional-training-and-evaluation) contains training,
+evaluation, and prediction commands using the published data. For new sessions,
+substitute the manifest and annotation paths produced by your import. Select
+`--split validation` for `s02`; keep `s03` frozen for final evaluation.
+
+To run the eight-image learning diagnostic on the included data:
 
 ```powershell
-.\.venv-cv\Scripts\python.exe -m oscillator_cv annotate data\processed\manifest-<timestamp>.json --output data\local-annotations\annotations.json
+.\.venv-cv\Scripts\python.exe scripts\overfit_check.py --manifest data\pilot-s01\manifest.json --annotations data\pilot-s01\annotations.json --output-dir runs\public-overfit-001
 ```
 
-In the OpenCV window, click board-axis tail at the buzzer end, axis head at the power-module end, then near the potentiometer to open a magnified crop from the original photograph. In that crop, click the circular dial center and the orange pointer tip. Fractional working-image coordinates are retained. Press `1`/`2` for left OFF/ON, `3`/`4` for right OFF/ON, `v`/`o`/`a`/`r` for valid/occluded/ambiguous/rejected, `n` to save and advance, `z` to reset, `e` to redo the potentiometer points, or `q` to stop. `--review-pot` revisits saved valid labels that have not yet been refined with this zoom, preserving their axis and switch labels; rerunning it resumes unfinished review. `--script` accepts reviewed JSON annotations for reproducible tests and migrations.
+It selects P00 and P09 with all four switch states, checks fit every 25 steps,
+and stops on its diagnostic gate or at 300 steps. It saves predictions, overlays,
+checkpoints, and a report. `--evaluate-checkpoint` reviews a saved diagnostic
+checkpoint without training. Diagnostic checkpoints count steps and cannot be
+resumed by ordinary epoch-based training.
 
-Render preprocessing overlays:
+New CLI runs use GroupNorm, a 4 × 4 switch pooling grid, and seed 11. The seed
+controls initialization and minibatch randomness; use the same fixture seed
+when comparing synthetic runs. `--normalization batch --switch-pool-grid 1`
+selects the earlier architecture for comparison. Synthetic fixtures require an
+explicit `--synthetic` flag.
 
-```powershell
-.\.venv-cv\Scripts\python.exe -m oscillator_cv preprocess-check data\processed\manifest-<timestamp>.json --annotations data\local-annotations\annotations.json --output-dir runs\preprocess-<timestamp>
-```
-
-Train, resume into a new run directory, evaluate, and predict:
-
-```powershell
-.\.venv-cv\Scripts\python.exe -m oscillator_cv train --manifest data\processed\manifest-<timestamp>.json --annotations data\local-annotations\annotations.json --split train --output-dir runs\train-<timestamp>
-.\.venv-cv\Scripts\python.exe -m oscillator_cv train --manifest data\processed\manifest-<timestamp>.json --annotations data\local-annotations\annotations.json --split train --resume runs\train-<timestamp>\checkpoint-epoch-0010.pt --output-dir runs\resume-<timestamp>
-.\.venv-cv\Scripts\python.exe -m oscillator_cv evaluate runs\resume-<timestamp>\checkpoint-epoch-0020.pt --manifest data\processed\manifest-<timestamp>.json --annotations data\local-annotations\annotations.json --split validation --output runs\evaluation-<timestamp>.json
-.\.venv-cv\Scripts\python.exe -m oscillator_cv predict IMAGE --checkpoint runs\resume-<timestamp>\checkpoint-epoch-0020.pt --output runs\prediction-<timestamp>.json
-```
-
-Prediction JSON is deliberately marked `accepted: false` until thresholds are derived from real held-out sessions. Synthetic data is exposed only through explicit `--synthetic` flags for tests and plumbing checks.
-
-`train --seed` defaults to 11 and controls model initialization and minibatch randomness; it also controls fixtures when `--synthetic` is used. Use the same fixture seed for synthetic training and evaluation. New checkpoints record the training seed. Resume restores weights and optimizer state but restarts the seeded random sequence, rather than reproducing an uninterrupted run exactly. Checkpoint loading accepts tensor/dictionary data only and has no unrestricted-pickle fallback; use checkpoints from a trusted source.
-
-### Small-set learning diagnostic
-
-Run from the repository root, using a new output directory:
-
-```powershell
-.\.venv-cv\Scripts\python.exe scripts\overfit_check.py --manifest data\processed\s01-manifest.json --annotations data\local-annotations\s01.json --output-dir runs\overfit-<timestamp>
-```
-
-This selects P00 and P09, covering eight images and all four switch states. It checks training fit every 25 optimization steps, stops on its diagnostic gate or at 300 steps, and saves checkpoints, per-image predictions, overlays, and a report. It does not modify photographs or labels. `--evaluate-checkpoint` can render a previously saved diagnostic checkpoint without training.
-
-New CLI training runs default to GroupNorm and a 4-by-4 switch pooling grid; `--normalization batch --switch-pool-grid 1` retains the old architecture for comparison. Old checkpoints remain loadable for evaluation, but cannot resume under a different heatmap objective. Diagnostic checkpoints count optimization steps rather than epochs and cannot be resumed by the ordinary training command. Spatial heatmap peaks are not calibrated correctness probabilities.
+Ordinary `train --resume` restores model and optimizer state and runs `--epochs`
+additional epochs into a new output directory. It restarts the seeded random
+sequence, so it does not exactly reproduce uninterrupted training. Checkpoints
+with another heatmap objective can be evaluated but cannot resume this loss.
+Only tensor/dictionary checkpoints are accepted; use files from a trusted source.
+Spatial heatmap peaks are not calibrated correctness probabilities.

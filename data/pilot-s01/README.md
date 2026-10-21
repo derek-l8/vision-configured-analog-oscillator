@@ -36,19 +36,14 @@ Both manifest paths point to the published processed image, relative to the
 manifest's directory. Its transform is therefore identity, not the earlier
 full-resolution-to-working resize. Moving the whole package preserves its paths.
 
-## Load and train
+## Inspect or run the package
 
-After the environment setup in the [implementation guide](../../docs/computer-vision-plan.md),
-run from the repository root, using a new output directory:
-
-```powershell
-.\.venv-cv\Scripts\python.exe -m oscillator_cv train --manifest data\pilot-s01\manifest.json --annotations data\pilot-s01\annotations.json --split train --epochs 10 --batch-size 4 --device cpu --output-dir runs\public-pilot-001
-```
-
-This starts a new run; it does not reproduce the final 60-epoch result by itself.
-The [experiment history](../../docs/cv-experiments.md) records training budgets
-and the lower-learning-rate resume. Checkpoints and generated run outputs are not
-included in this package.
+The [verification guide](../../docs/verification.md#computer-vision-evidence)
+contains environment setup, label-overlay inspection, and optional training,
+evaluation, and prediction commands using only these published files.
+Checkpoints and generated run outputs are not included. The
+[experiment history](../../docs/cv-experiments.md) records the earlier training
+budgets and results.
 
 ## Limits
 

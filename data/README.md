@@ -11,8 +11,9 @@ The private working dataset remains local. The [published first session](pilot-s
 - Primary dataset captured unpowered with the momentary button released.
 - Orange potentiometer pointer and both blue switch tabs unobstructed.
 - Normal framing keeps the board at approximately 75-85% of image height.
-- In-plane rotation may vary by approximately plus or minus 25 degrees.
-- Perspective remains near-overhead, with no more than approximately 15 degrees of deliberate tilt.
+- Keep the board roughly upright. Small alignment differences from naturally repositioning the camera are expected; no deliberate board rotation or angle cycle is required.
+- Stay near-overhead. Small natural perspective differences are expected; avoid deliberate tilt and keep any incidental tilt modest (roughly within 15 degrees).
+- Keep wires, components, and colored markers fixed after collection starts.
 
 The ten-image visibility set includes closer, farther, rotated, tilted, and differently lit examples. It exists to test preprocessing and control visibility; it is not training or evaluation data.
 
@@ -43,7 +44,28 @@ Each full session contains 40 photographs: ten potentiometer positions by four s
 L0R0 -> L1R0 -> L1R1 -> L0R1
 ```
 
-A generated capture manifest assigns approximate board-rotation bins independently of the control state. Exact board rotation is derived from annotation rather than treated as known from the capture request.
+The generated capture manifest uses a nominal rotation intent of 0 degrees to mean roughly aligned, not exact alignment or a measured angle. Reposition the camera naturally without assigning an orientation to a switch state. Actual board rotation is derived from annotation.
+
+## Next capture: s02
+
+The 40-photo training session `s01` is complete. Capture `s02` as a fresh validation session using the same 10-by-4 control grid. Set up the camera again and make an ordinary change to lighting direction or background; keep the board roughly aligned and normally framed. Evaluate the existing checkpoint on `s02` before retraining.
+
+| Pot ID | Approximate pointer angle | s02 photo numbers |
+|---|---:|---|
+| P00 | 45 degrees | 041-044 |
+| P01 | 75 degrees | 045-048 |
+| P02 | 105 degrees | 049-052 |
+| P03 | 135 degrees | 053-056 |
+| P04 | 165 degrees | 057-060 |
+| P05 | 195 degrees | 061-064 |
+| P06 | 225 degrees | 065-068 |
+| P07 | 255 degrees | 069-072 |
+| P08 | 285 degrees | 073-076 |
+| P09 | 315 degrees | 077-080 |
+
+The angles only need to be approximate; labels use the annotated center, pointer tip, and board axis. Use the filenames in `manifests/pilot-capture-plan.csv`, beginning with `s02_p00_l0_r0_041.jpg` and ending with `s02_p09_l0_r1_080.jpg`. Numbering continues across sessions.
+
+Capture `s03` as another independent session under ordinary intended-use conditions and reserve it for the final frozen-model test. The initial pilot totals 120 photos including the existing `s01`. Expand only if validation shows that additional training data is needed.
 
 Recommended filenames use lowercase identifiers:
 
@@ -87,7 +109,7 @@ The board axis is ordered from the buzzer/bottom end to the power-module/top end
 
 ## Splitting and publication
 
-The default `pilot-capture-plan.csv` contains 120 photos: `s01` is training, `s02` validation, and `s03` test. `capture-plan --sessions 6` adds training sessions `s04`–`s06` while keeping the same held-out sessions. The earlier `capture-plan.csv` is retained for historical reference, with its original six-session splits. Existing imported manifests retain their original splits; do not relabel historical runs after training.
+The default `pilot-capture-plan.csv` contains 120 photos: `s01` is training, `s02` validation, and `s03` test. `capture-plan --sessions 6` adds training sessions `s04`–`s06` while keeping the same held-out sessions. The earlier `capture-plan.csv` is retained for historical reference, with its original six-session splits and deliberate rotation targets; do not use it for new captures. Existing imported manifests retain their original splits and capture metadata; regenerating a capture plan does not change historical datasets.
 
 - Split by complete capture session, never by randomly mixing photographs from one setup.
 - Keep augmented images in the same split as their source.
