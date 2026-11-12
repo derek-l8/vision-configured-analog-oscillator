@@ -48,6 +48,10 @@ if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed.' }
 .\.venv-cv\Scripts\python.exe -m oscillator_cv --help
 ```
 
+To update an existing copy, get the latest version (`git pull`, or download it
+again), then rerun the whole block in a new PowerShell window. Include the `$env:`
+lines so `uv` updates `.venv-cv` instead of creating a separate `.venv`.
+
 These examples use CPU and require no downloaded model. Choose a new run name
 each time; training refuses an existing output directory. Generated files under
 `runs/` and environment directories stay ignored by Git.
@@ -67,8 +71,11 @@ CPU and do not train a full model.
 .\.venv-cv\Scripts\python.exe -m oscillator_cv preprocess-check data\pilot-s01\manifest.json --annotations data\pilot-s01\annotations.json --output-dir runs\public-overlays-001
 ```
 
-Open the generated images to inspect the board axis, center, and pointer-tip
-labels. Full-resolution annotation zoom is unavailable because the original
+The command reports `"images": 40` and writes one `-overlay.jpg` per photo, plus
+`preprocess-report.json`, to `runs\public-overlays-001`. In each overlay, the yellow
+arrow is the board axis, the green circle is the potentiometer center, and the
+orange arrow points to the pointer tip; the top bar shows the label status and
+switch states. Full-resolution annotation zoom is unavailable because the original
 photographs are not part of the public dataset.
 
 ### Optional training and evaluation
