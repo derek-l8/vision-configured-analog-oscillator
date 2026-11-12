@@ -11,16 +11,17 @@ progress to read the potentiometer and switches from photographs.
 The potentiometer and two maintained switches change the tone. Holding the button
 suppresses the buzzer and fades the LED; releasing it lets both recover.
 
-**Hardware demonstration**
+The videos are hosted on YouTube. Click a video thumbnail or its ▶ link to open
+the video there. Audio is amplified with peak limiting for audibility. Click a
+photograph for the full-resolution version.
 
-[![Hardware demonstration video](https://img.youtube.com/vi/ZT9Dfc7WwDQ/hqdefault.jpg)](https://www.youtube.com/watch?v=ZT9Dfc7WwDQ)
+**Hardware demonstration** · [▶ Watch on YouTube (0:48)](https://www.youtube.com/watch?v=ZT9Dfc7WwDQ)
 
-**Envelope and LED close-up**
+[![Hardware demonstration video: click to watch on YouTube](https://img.youtube.com/vi/ZT9Dfc7WwDQ/hqdefault.jpg)](https://www.youtube.com/watch?v=ZT9Dfc7WwDQ)
 
-[![Envelope and LED close-up video](https://img.youtube.com/vi/p56R-pE1Pj4/hqdefault.jpg)](https://www.youtube.com/watch?v=p56R-pE1Pj4)
+**Envelope and LED close-up** · [▶ Watch on YouTube (0:04)](https://www.youtube.com/watch?v=p56R-pE1Pj4)
 
-Click a video thumbnail to play it on YouTube. Audio is amplified with peak
-limiting for audibility. Click a photograph for the full-resolution version.
+[![Envelope and LED close-up video: click to watch on YouTube](https://img.youtube.com/vi/p56R-pE1Pj4/hqdefault.jpg)](https://www.youtube.com/watch?v=p56R-pE1Pj4)
 
 ## Circuit operation
 
@@ -111,4 +112,6 @@ the pitch far enough to make the alternating blinking visible.
 
 [![Original physics-class prototype](hardware/history/original-prototype-web.jpg)](hardware/history/original-prototype.jpg)
 
-[![Original prototype demonstration video](https://img.youtube.com/vi/NzmC0kEN6VM/hqdefault.jpg)](https://www.youtube.com/watch?v=NzmC0kEN6VM)
+**Prototype demonstration** · [▶ Watch on YouTube (0:15)](https://www.youtube.com/watch?v=NzmC0kEN6VM)
+
+[![Original prototype demonstration video: click to watch on YouTube](https://img.youtube.com/vi/NzmC0kEN6VM/hqdefault.jpg)](https://www.youtube.com/watch?v=NzmC0kEN6VM)
