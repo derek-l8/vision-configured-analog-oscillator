@@ -17,13 +17,11 @@ def capture_rows(session_count: int = 3) -> list[dict[str, Any]]:
         raise ValueError("capture plan must contain 3 or 6 sessions")
     rows: list[dict[str, Any]] = []
     sequence = 1
-    rotation_bins = (-25, -15, -5, 5, 15, 25)
     for session_index in range(1, session_count + 1):
         session_id = f"s{session_index:02d}"
         for pot_index, target_deg in enumerate(POT_TARGETS_DEG):
-            for switch_index, (left, right) in enumerate(SWITCH_ORDER):
+            for left, right in SWITCH_ORDER:
                 image_id = f"{session_id}_p{pot_index:02d}_l{left}_r{right}_{sequence:03d}"
-                rotation = rotation_bins[(session_index + pot_index + switch_index) % len(rotation_bins)]
                 rows.append(
                     {
                         "schema_version": SCHEMA_VERSION,
@@ -35,9 +33,10 @@ def capture_rows(session_count: int = 3) -> list[dict[str, Any]]:
                         "pot_target_deg": target_deg,
                         "s_left_on": left,
                         "s_right_on": right,
-                        "capture_rotation_intent_deg": rotation,
+                        # Nominal alignment target, not a measured board angle.
+                        "capture_rotation_intent_deg": 0,
                         "camera_source": "iphone-rear-1x",
-                        "capture_notes": "",
+                        "capture_notes": "roughly aligned; natural camera variation; no deliberate rotation",
                         # Keep the pilot's held-out sessions when adding training data.
                         "split": "validation" if session_index == 2 else ("test" if session_index == 3 else "train"),
                     }

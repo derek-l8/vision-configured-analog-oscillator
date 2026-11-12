@@ -7,6 +7,7 @@ All real-photo results below evaluate the **same images used for training**.
 They show whether the model can fit the supplied labels, not accuracy on new
 photographs. Pixel and angle errors are relative to manual annotations, not
 independently measured physical dial positions. Predictions remain unaccepted.
+"Evidence" paths name local run folders that are not published.
 
 ## Initial execution check — September 15, 2026
 
