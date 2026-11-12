@@ -13,14 +13,14 @@ suppresses the buzzer and fades the LED; releasing it lets both recover.
 
 **Hardware demonstration**
 
-https://github.com/user-attachments/assets/6a8cb63d-4a44-4317-ac0d-6d29a920b673
+[![Hardware demonstration video](https://img.youtube.com/vi/ZT9Dfc7WwDQ/hqdefault.jpg)](https://www.youtube.com/watch?v=ZT9Dfc7WwDQ)
 
 **Envelope and LED close-up**
 
-https://github.com/user-attachments/assets/1e42837d-ddef-4ed7-b5bc-d3109db0a690
+[![Envelope and LED close-up video](https://img.youtube.com/vi/p56R-pE1Pj4/hqdefault.jpg)](https://www.youtube.com/watch?v=p56R-pE1Pj4)
 
-Audio is amplified with peak limiting for audibility. Use the player's speaker
-control to unmute. Click a photograph for the full-resolution version.
+Click a video thumbnail to play it on YouTube. Audio is amplified with peak
+limiting for audibility. Click a photograph for the full-resolution version.
 
 ## Circuit operation
 
@@ -89,7 +89,7 @@ small-batch normalization mismatch, and lost switch-position information.
 Spatial heatmap loss, GroupNorm, and a spatial switch head improved the fit;
 the [experiment history](docs/cv-experiments.md) records the runs and results.
 Evaluation so far reuses training photographs; performance on an independent
-capture session remains unknown.
+capture session remains unknown. Trained weights are not published yet.
 
 The [published training session](data/pilot-s01/README.md) contains all 40 processed
 photos and manual labels. [Verification](docs/verification.md#computer-vision-evidence)
@@ -101,7 +101,7 @@ and the [capture protocol](data/README.md) provide the technical details.
 - Measure physical waveforms and frequency, and calibrate potentiometer angle to resistance.
 - Evaluate the existing model on a fresh `s02` validation session; reserve `s03` for the final test.
 - Establish prediction acceptance thresholds and verify the switch-to-capacitor mapping.
-- Connect accepted predictions and calibration to an LTspice controller. Trained weights are not published yet.
+- Connect accepted predictions and calibration to an LTspice controller.
 
 ## Original prototype
 
@@ -111,4 +111,4 @@ the pitch far enough to make the alternating blinking visible.
 
 [![Original physics-class prototype](hardware/history/original-prototype-web.jpg)](hardware/history/original-prototype.jpg)
 
-https://github.com/user-attachments/assets/623c1aa6-c2fb-44d2-a902-93ec4056ba6b
+[![Original prototype demonstration video](https://img.youtube.com/vi/NzmC0kEN6VM/hqdefault.jpg)](https://www.youtube.com/watch?v=NzmC0kEN6VM)

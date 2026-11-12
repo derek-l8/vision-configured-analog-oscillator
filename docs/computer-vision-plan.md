@@ -116,9 +116,7 @@ Vision error, calibration error, LTspice-model error, and physical measurement e
 ## Collecting another session
 
 Follow the [capture protocol](../data/README.md), including the `s02` grid and
-filenames. Demo-video rotation and cropping are presentation edits; training
-photos still use the portrait convention with power at the top.
-The checked-in `pilot-capture-plan.csv` specifies roughly upright alignment.
+filenames. The checked-in `pilot-capture-plan.csv` specifies roughly upright alignment.
 The older `capture-plan.csv` retains historical deliberate-rotation targets and
 must not be used for new captures.
 

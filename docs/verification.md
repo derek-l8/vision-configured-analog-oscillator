@@ -21,9 +21,9 @@ The [circuit notes](circuit-design.md#interpreting-the-simulation) describe mode
 
 The [s01 package](../data/pilot-s01/README.md) includes 40 processed images,
 manual labels, and a relative-path manifest. All images are training data.
-The [experiment history](cv-experiments.md) records the reported 60-epoch result;
-the corresponding trained weights and generated reports have not been published.
-That checkpoint cannot currently be downloaded and re-evaluated from this repository.
+The [experiment history](cv-experiments.md) records the reported 60-epoch result.
+Its checkpoint and reports are not published, so that result cannot be re-evaluated
+from this repository.
 
 The following steps inspect the included data and optionally train a new model.
 An independent capture session is needed to assess performance on new photographs.
@@ -51,6 +51,15 @@ if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed.' }
 These examples use CPU and require no downloaded model. Choose a new run name
 each time; training refuses an existing output directory. Generated files under
 `runs/` and environment directories stay ignored by Git.
+
+### Run the tests
+
+```powershell
+.\.venv-cv\Scripts\python.exe -m pytest
+```
+
+The tests use small synthetic fixtures and the published s01 package. They run on
+CPU and do not train a full model.
 
 ### Inspect the published labels
 
