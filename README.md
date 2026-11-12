@@ -11,9 +11,8 @@ progress to read the potentiometer and switches from photographs.
 The potentiometer and two maintained switches change the tone. Holding the button
 suppresses the buzzer and fades the LED; releasing it lets both recover.
 
-The videos are hosted on YouTube. Click a video thumbnail or its ▶ link to open
-the video there. Audio is amplified with peak limiting for audibility. Click a
-photograph for the full-resolution version.
+Audio is amplified with peak limiting for audibility. Click a photograph for the
+full-resolution version.
 
 **Hardware demonstration** · [▶ Watch on YouTube (0:48)](https://www.youtube.com/watch?v=ZT9Dfc7WwDQ)
 
